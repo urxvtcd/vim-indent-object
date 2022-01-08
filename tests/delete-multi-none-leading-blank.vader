@@ -1,0 +1,21 @@
+Include: before.vader
+
+Given (multi-line indent with blank line):
+  first line
+      second line
+
+          third line
+          fourth line
+      fifth line
+  sixth line
+
+Do (move to blank line in multi-line indent, and delete inner indent):
+  /third\<CR>
+  j
+  dii
+
+Expect (multi-line indent deleted):
+  first line
+      second line
+      fifth line
+  sixth line

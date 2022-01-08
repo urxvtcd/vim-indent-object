@@ -1,0 +1,18 @@
+Include: before.vader
+
+Given:
+  first line
+          second line
+              third line
+              fourth line
+      fifth line
+  sixth line
+
+Do:
+  /third\<CR>
+  VaiaId
+
+Expect:
+  first line
+      fifth line
+  sixth line

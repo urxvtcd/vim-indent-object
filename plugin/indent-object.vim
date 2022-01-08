@@ -4,11 +4,12 @@
 "
 "  http://github.com/michaeljsmith/vim-indent-object
 "
-"  Permission is hereby granted, free of charge, to any person obtaining a copy
-"  of this software and associated documentation files (the "Software"), to
-"  deal in the Software without restriction, including without limitation the
-"  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-"  sell copies of the Software, and to permit persons to whom the Software is
+"  Permission is hereby granted, free of charge, to any person obtaining
+"  a copy of this software and associated documentation files (the
+"  "Software"), to deal in the Software without restriction, including without
+"  limitation the rights to use, copy, modify, merge, publish, distribute,
+"  sublicense, and/or sell copies of the Software, and to permit persons to whom
+"  the Software is
 "  furnished to do so, subject to the following conditions:
 "
 "  The above copyright notice and this permission notice shall be included in
@@ -24,211 +25,275 @@
 "
 "--------------------------------------------------------------------------------
 
-" Mappings excluding line below.
-onoremap <silent>ai :<C-u>cal <Sid>HandleTextObjectMapping(0, 0, 0, [line("."), line("."), col("."), col(".")])<CR>
-onoremap <silent>ii :<C-u>cal <Sid>HandleTextObjectMapping(1, 0, 0, [line("."), line("."), col("."), col(".")])<CR>
-vnoremap <silent>ai :<C-u>cal <Sid>HandleTextObjectMapping(0, 0, 1, [line("'<"), line("'>"), col("'<"), col("'>")])<CR><Esc>gv
-vnoremap <silent>ii :<C-u>cal <Sid>HandleTextObjectMapping(1, 0, 1, [line("'<"), line("'>"), col("'<"), col("'>")])<CR><Esc>gv
+onoremap <Plug>(indent-object_linewise-none)  :<C-u>call <SID>handle_operator_mapping(0, 0, 0)<CR>
+vnoremap <Plug>(indent-object_linewise-none)  :<C-u>call <SID>handle_visual_mapping(0, 0, 0)<CR>
+onoremap <Plug>(indent-object_linewise-start) :<C-u>call <SID>handle_operator_mapping(1, 0, 0)<CR>
+vnoremap <Plug>(indent-object_linewise-start) :<C-u>call <SID>handle_visual_mapping(1, 0, 0)<CR>
+onoremap <Plug>(indent-object_linewise-end)   :<C-u>call <SID>handle_operator_mapping(0, 1, 0)<CR>
+vnoremap <Plug>(indent-object_linewise-end)   :<C-u>call <SID>handle_visual_mapping(0, 1, 0)<CR>
+onoremap <Plug>(indent-object_linewise-both)  :<C-u>call <SID>handle_operator_mapping(1, 1, 0)<CR>
+vnoremap <Plug>(indent-object_linewise-both)  :<C-u>call <SID>handle_visual_mapping(1, 1, 0)<CR>
 
-" Mappings including line below.
-onoremap <silent>aI :<C-u>cal <Sid>HandleTextObjectMapping(0, 1, 0, [line("."), line("."), col("."), col(".")])<CR>
-onoremap <silent>iI :<C-u>cal <Sid>HandleTextObjectMapping(1, 1, 0, [line("."), line("."), col("."), col(".")])<CR>
-vnoremap <silent>aI :<C-u>cal <Sid>HandleTextObjectMapping(0, 1, 1, [line("'<"), line("'>"), col("'<"), col("'>")])<CR><Esc>gv
-vnoremap <silent>iI :<C-u>cal <Sid>HandleTextObjectMapping(1, 1, 1, [line("'<"), line("'>"), col("'<"), col("'>")])<CR><Esc>gv
+onoremap <Plug>(indent-object_blockwise-none)  :<C-u>call <SID>handle_operator_mapping(0, 0, 1)<CR>
+vnoremap <Plug>(indent-object_blockwise-none)  :<C-u>call <SID>handle_visual_mapping(0, 0, 1)<CR>
+onoremap <Plug>(indent-object_blockwise-start) :<C-u>call <SID>handle_operator_mapping(1, 0, 1)<CR>
+vnoremap <Plug>(indent-object_blockwise-start) :<C-u>call <SID>handle_visual_mapping(1, 0, 1)<CR>
+onoremap <Plug>(indent-object_blockwise-end)   :<C-u>call <SID>handle_operator_mapping(0, 1, 1)<CR>
+vnoremap <Plug>(indent-object_blockwise-end)   :<C-u>call <SID>handle_visual_mapping(0, 1, 1)<CR>
+onoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_operator_mapping(1, 1, 1)<CR>
+vnoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_visual_mapping(1, 1, 1)<CR>
 
-let s:l0 = -1
-let s:l1 = -1
-let s:c0 = -1
-let s:c1 = -1
+let s:last_range = {
+			\ 'include_start': 0,
+			\ 'include_end': 0,
+			\ 'is_blockwise': 0,
+			\ 'start': -1,
+			\ 'end': -1,
+			\ }
 
-if !exists("g:indent_object_except_first_level")
-	let g:indent_object_except_first_level = 1
-endif
+function! <SID>handle_operator_mapping(include_start, include_end, is_blockwise)
+	call <SID>expand_range(
+				\ {
+					\ 'include_start': a:include_start,
+					\ 'include_end': a:include_end,
+					\ 'is_blockwise': a:is_blockwise,
+					\ 'start': line("."),
+					\ 'end': line("."),
+					\ },
+					\ v:count1,
+					\ )
+endfunction
 
-function! <Sid>TextObject(inner, incbelow, vis, range, count)
+function! <SID>handle_visual_mapping(include_start, include_end, is_blockwise)
+	call <SID>expand_range(
+				\ {
+					\ 'include_start': a:include_start,
+					\ 'include_end': a:include_end,
+					\ 'is_blockwise': a:is_blockwise,
+					\ 'start': line("'<"),
+					\ 'end': line("'>"),
+				\ },
+				\ v:count1,
+				\ )
+endfunction
 
-	" Record the current state of the visual region.
-	let vismode = "V"
+function! <SID>expand_range(initial_range, count)
+	let counts_to_go = a:count " Curiously, count isn't allowed as a name.
+	let range = copy(a:initial_range)
 
-	" Detect if this is a completely new visual selction session.
-	let new_vis = 0
-	let new_vis = new_vis || s:l0 != a:range[0]
-	let new_vis = new_vis || s:l1 != a:range[1]
-	let new_vis = new_vis || s:c0 != a:range[2]
-	let new_vis = new_vis || s:c1 != a:range[3]
+	" If the start and end of range requested by user are the same as seen the
+	" last time, but it now also includes a delimiter that wasn't included
+	" before, we add that delimiter and consume a count.
+	if s:include_previously_excluded_delimiters(range)
+		let counts_to_go -= 1
 
-	let s:l0 = a:range[0]
-	let s:l1 = a:range[1]
-	let s:c0 = a:range[2]
-	let s:c1 = a:range[3]
+	" Otherwise, if is_blockwise is the only field of range that changed, just
+	" consume a count, allowing user to toggle between the blockwise and
+	" linewise types of selection.
+	elseif s:only_blockwise_changed(range)
+		let counts_to_go -= 1
+	endif
 
-	" Repeatedly increase the scope of the selection.
-	let itr_cnt = 0
-	let cnt = a:count
-	while cnt > 0
+	" If the supplied selection already contains all the lines having the same
+	" or greater indent level as the outermost indent found in the selection,
+	" we need to differentiate whether the selection was created manually by
+	" user, or by our previous invocation. In the first case, we should leave
+	" the selection untouched. Rationale: "dii" invoked on an indent
+	" consisting of a single line should only delete that line, and not spill
+	" outwards. In the second case, we need to expand outwards, or else
+	" growing the selection with consecutive "ii"s in visual mode would not
+	" work.
+	let should_expand_outward = range == s:last_range
 
-		" Look for the minimum indentation in the current visual region.
-		let l = s:l0
-		let idnt_invalid = 1000
-		let idnt = idnt_invalid
-		while l <= s:l1
-			if !(getline(l) =~ "^\\s*$")
-				let idnt = min([idnt, indent(l)])
-			endif
-			let l += 1
-		endwhile
+	let indent = s:find_outermost_indent_in_range(range.start, range.end)
 
-		" Keep track of where the range should be expanded to.
-		let l_1 = s:l0
-		let l_1o = l_1
-		let l2 = s:l1
-		let l2o = l2
+	" If the range contained only blank lines, we need to look
+	" above and below it to determine the indent.
+	if indent == -1
+		let indent = s:find_innermost_indent_adjacent_to_range(range.start, range.end)
 
-		" If we are highlighting only blank lines, we may not have found a
-		" valid indent. In this case we need to look for the next and previous
-		" non blank lines and check which of those has the largest indent.
-		if idnt == idnt_invalid
-			let idnt = 0
-			let pnb = prevnonblank(s:l0)
-			if pnb
-				let idnt = max([idnt, indent(pnb)])
-				let l_1 = pnb
-			endif
-			let nnb = nextnonblank(s:l0)
-			if nnb
-				let idnt = max([idnt, indent(nnb)])
-			endif
-
-			" If we are in whitespace at the beginning of a block, skip over
-			" it when we are selecting the range. Similarly, if we are in
-			" whitespace at the end, ignore it.
-			if idnt > indent(pnb)
-				let l_1 = nnb
-			endif
-			if idnt > indent(nnb)
-				let l2 = pnb
-			endif
+		" Whole file is blank. Select all but the last line.
+		if indent == -1
+			let range.start = 1
+			let range.end = max([line('$') - 1, 1])
+			let counts_to_go = 0
 		endif
+	endif
 
-		" Search backward for the first line with less indent than the target
-		" indent (skipping blank lines).
-		let blnk = getline(l_1) =~ "^\\s*$"
-		while l_1 > 0 && (blnk || indent(l_1) >= idnt)
-			if g:indent_object_except_first_level && idnt == 0 && blnk
+	while counts_to_go > 0
+		let old_range = copy(range)
+
+		let range.start = s:expand_in_direction(range.start, indent, -1, range.include_start)
+		let range.end = s:expand_in_direction(range.end, indent, 1, range.include_end)
+
+		call s:fix_delimiters(range)
+
+		if old_range == range
+			if !should_expand_outward
+				let counts_to_go -= 1
+				let should_expand_outward = 1
+				continue
+			endif
+
+			" No point in further expansion if whole file is already in range.
+			if range.start == 1 && range.end == line('$')
 				break
 			endif
-			if !blnk || !a:inner
-				let l_1o = l_1
-			endif
-			let l_1 -= 1
-			let blnk = getline(l_1) =~ "^\\s*$"
-		endwhile
 
-		" Search forward for the first line with more indent than the target
-		" indent (skipping blank lines).
-		let line_cnt = line("$")
-		let blnk = getline(l2) =~ "^\\s*$"
-		while l2 <= line_cnt && (blnk || indent(l2) >= idnt)
-			if g:indent_object_except_first_level && idnt == 0 && blnk
-				break
-			endif
-			if !blnk || !a:inner
-				let l2o = l2
-			endif
-			let l2 += 1
-			let blnk = getline(l2) =~ "^\\s*$"
-		endwhile
-
-		" Determine which of these extensions to include. Include neither if
-		" we are selecting an 'inner' object. Exclude the bottom unless are
-		" told to include it.
-		let idnt2 = max([indent(l_1), indent(l2)])
-		if indent(l_1) < idnt2 || a:inner
-			let l_1 = l_1o
-		endif
-		if indent(l2) < idnt2 || a:inner || !a:incbelow
-			let l2 = l2o
-		endif
-		let l_1 = max([l_1, 1])
-		let l2 = min([l2, line("$")])
-
-		" Extend the columns to the start and end.
-		" If inner is selected, set the final cursor pos to the start
-		" of the text in the line.
-		let c_1 = 1
-		if a:inner
-			let c_1 = match(getline(l_1), "\\c\\S") + 1
-		endif
-		let c2 = len(getline(l2))
-		if !a:inner
-			let c2 += 1
-		endif
-
-		" Make sure there's no change if we haven't really made a
-		" significant change in linewise mode - this makes sure that
-		" we can iteratively increase selection in linewise mode.
-		if itr_cnt == 0 && vismode ==# 'V' && s:l0 == l_1 && s:l1 == l2
-			let c_1 = s:c0
-			let c2 = s:c1
-		endif
-
-		" Check whether the visual region has changed.
-		let chg = 0
-		let chg = chg || s:l0 != l_1
-		let chg = chg || s:l1 != l2
-		let chg = chg || s:c0 != c_1
-		let chg = chg || s:c1 != c2
-
-		if vismode ==# 'V' && new_vis
-			let chg = 1
-		endif
-
-		" Update the vars.
-		let s:l0 = l_1
-		let s:l1 = l2
-		let s:c0 = c_1
-		let s:c1 = c2
-
-		" If there was no change, then don't decrement the count (it didn't
-		" count because it didn't do anything).
-		if chg
-			let cnt = cnt - 1
+			" Set indent to the innermost adjacent one, so next iteration
+			" makes progress.
+			let indent = s:find_innermost_indent_adjacent_to_range(range.start, range.end)
 		else
-			" Since this didn't work, push the selection back one char. This
-			" will have the effect of getting the enclosing block. Do it at
-			" the beginning rather than the end - the beginning is very likely
-			" to be only one indentation level different.
-			if s:l0 == 0
-				return
-			endif
-			let s:l0 -= 1
-			let s:c0 = len(getline(s:l0))
+			let counts_to_go -= 1
+			let should_expand_outward = 1
 		endif
-
-		let itr_cnt += 1
-
 	endwhile
 
-	" Apply the range we have found. Make sure to use the current visual mode.
-	call cursor(s:l0, s:c0)
-	exe "normal! " . vismode
-	call cursor(s:l1, s:c1)
-	normal! o
+	let s:last_range = range
 
-	" Update these static variables - we need to keep these up-to-date between
-	" invocations because it's the only way we can detect whether it's a new
-	" visual mode. We need to know if it's a new visual mode because otherwise
-	" if there's a single line block in visual line mode and we select it with
-	" "V", we can't tell whether it's already been selected using Vii.
-	exe "normal! \<Esc>"
-	let s:l0 = line("'<")
-	let s:l1 = line("'>")
-	let s:c0 = col("'<")
-	let s:c1 = col("'>")
-	normal gv0o0
+	call s:set_cursor(range, indent)
+endfunction
+
+function! s:only_blockwise_changed(range)
+	if s:last_range.is_blockwise == a:range.is_blockwise
+		return 0
+	elseif s:last_range.start != a:range.start
+		return 0
+	elseif s:last_range.end != a:range.end
+		return 0
+	elseif s:last_range.include_start != a:range.include_start
+		return 0
+	elseif s:last_range.include_end != a:range.include_end
+		return 0
+	endif
+
+	return 1
+endfunction
+
+function! s:include_previously_excluded_delimiters(range)
+	if a:range.start == s:last_range.start && a:range.end == s:last_range.end
+		let changed = 0
+
+		" If a delimiter wasn't previously included, or was and still is, we
+		" can include previously excluded opposing delimiter, if requested.
+		" Or conversely: if range *lost* a delimiter on one end, we assume user
+		" wants to expand the selection to reach further outward, and not just
+		" include previously excluded delimiter.
+		if !s:last_range.include_end || a:range.include_end
+			if !s:last_range.include_start && a:range.include_start
+				let a:range.start -= 1
+				let changed = 1
+			endif
+		endif
+		if !s:last_range.include_start || a:range.include_start
+			if !s:last_range.include_end && a:range.include_end
+				let a:range.end = nextnonblank(a:range.end + 1)
+				let changed = 1
+			endif
+		endif
+
+		if changed
+			call s:fix_delimiters(a:range)
+		endif
+
+		return changed
+	endif
 
 endfunction
 
-function! <Sid>HandleTextObjectMapping(inner, incbelow, vis, range)
-	call <Sid>TextObject(a:inner, a:incbelow, a:vis, a:range, v:count1)
+function! s:fix_delimiters(range)
+	" In a far-fetched case that user requested to include a delimiting
+	" line, and its indent was smaller than that of the opposing
+	" delimiting line, do not include the line. In other words: include
+	" flag for a line only applies when that line actually delimits this
+	" indent block.
+	if a:range.include_start
+		let closing_line = a:range.include_end ? a:range.end : nextnonblank(a:range.end + 1)
+		let closing_indent = indent(closing_line)
+		if indent(a:range.start) < closing_indent
+			let a:range.start += 1
+		endif
+	endif
+
+	if a:range.include_end
+		let opening_line = a:range.include_start ? a:range.start : prevnonblank(a:range.start - 1)
+		let opening_indent = indent(opening_line)
+		if indent(a:range.end) < opening_indent
+			let a:range.end -= 1
+		endif
+	endif
+endfunction
+
+function! s:set_cursor(range, outermost_indent)
+	if &expandtab
+		let outermost_first_char_column = a:outermost_indent + 1
+	else
+		let outermost_first_char_column = (a:outermost_indent / &tabstop) + 1
+	endif
+
+	call cursor(a:range.end, outermost_first_char_column)
+
+	if a:range.is_blockwise
+		exe "normal! \<C-v>"
+		call cursor(a:range.start, outermost_first_char_column)
+		exe "normal! _O$"
+	else
+		exe "normal! V"
+		call cursor(a:range.start, outermost_first_char_column)
+	endif
+endfunction
+
+function! s:expand_in_direction(start, range_indent, direction, include_boundary)
+	let current = a:start + a:direction
+	let expanded = a:start
+	let last_in_file = line('$')
+
+	while current > 0 && current <= last_in_file
+		if indent(current) >= a:range_indent || s:is_blank(current)
+			let expanded = current
+		else
+			if a:include_boundary
+				let expanded = current
+			endif
+			break
+		endif
+
+		let current += a:direction
+	endwhile
+
+	" Don't include the last trailing blank line.
+	if a:direction == 1 && s:is_blank(expanded)
+		let expanded -= 1
+	endif
+
+	return expanded
+endfunction
+
+function! s:find_innermost_indent_adjacent_to_range(start, end)
+	let pnb = prevnonblank(a:start - 1)
+	let pnb_indent = indent(pnb)
+
+	let nnb = nextnonblank(a:end + 1)
+	let nnb_indent = indent(nnb)
+
+	return max([pnb_indent, nnb_indent])
+endfunction
+
+function! s:find_outermost_indent_in_range(start, end)
+	let indent = v:numbermax
+	let found = 0
+
+	for line in range(a:start, a:end)
+		if !s:is_blank(line)
+			let indent = min([indent, indent(line)])
+			let found = 1
+		endif
+	endfor
+
+	" return -1 if all lines in range are blank
+	return found ? indent : -1
+endfunction
+
+function! s:is_blank(lnum)
+	return getline(a:lnum) =~ "^\\s*$"
 endfunction

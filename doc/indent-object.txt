@@ -4,97 +4,89 @@
 
 Indent Text Objects
 
-INTRODUCTION                      |indtobj-introduction|
-TEXT OBJECTS                      |indtobj-objects|
-BLANK LINES                       |indtobj-blanklines|
-ABOUT                             |indtobj-about|
+INTRODUCTION                      |indent-object-introduction|
+TEXT OBJECTS                      |indent-object-usage|
+ABOUT                             |indent-object-about|
 
 
 ==============================================================================
-INTRODUCTION                                            *indtobj-introduction*
+INTRODUCTION                                      *indent-object-introduction*
 
-Vim text objects provide a convenient way to select and operate on various
-types of objects. These objects include regions surrounded by various types of
-brackets and various parts of language (ie sentences, paragraphs, etc).
-
-This plugin defines a new text object, based on indentation levels. This is
-very useful in languages such as Python, in which the syntax defines scope in
-terms of indentation. Using the objects defined in this plugin, an entire if
-structure can be quickly selected, for example.
-
-
-==============================================================================
-TEXT OBJECTS                          *ai* *ii* *aI* *iI*     *indtobj-objects*
-
-This plugin defines two new text objects. These are very similar - they differ
-only in whether they include the line below the block or not.
-
-        Key Mapping       Description     ~
->
-        <count>ai         (A)n (I)ndentation level and line above.
-        <count>ii         (I)nner (I)ndentation level (no line above).
-        <count>aI         (A)n (I)ndentation level and lines above/below.
-        <count>iI         (I)nner (I)ndentation level (no lines above/below).
-<
-
-Note that the iI mapping is mostly included simply for completeness, it is
-effectively a synonym for ii.
-
-Just like regular text objects, these mappings can be used either with
-operators expecting a motion, such as 'd' or 'c', as well as in visual mode.
-In visual mode the mapping can be repeated, which has the effect of
-iteratively increasing the scope of indentation block selected. Specifying a
-count can be used to achieve the same effect.
-
-The difference between |ai| and |aI| is that |ai| includes the line
-immediately above the indentation block, whereas aI includes not only that,
-but also the line below. Which of these is most useful largely depends on the
-structure of the language being edited.
-
-For example, when editing the Python code, |ai| is generally more useful, as
-the line above the indentation block is usually related to it. For example, in
-the following code (* is used to indicate the cursor position):
->
-      if foo > 3:
-         log("foo is big") *
-         foo = 3
-      do_something_else()
-<
-the if clause is logically related to the code block, whereas the function
-call below is not. It is unlikely we would want to select the line below when
-we are interested in the if block.
-
-However, in other languages, such as Vim scripts, control structures are
-usually terminated with something like 'endif'. Therefore, in this example:
->
-      if foo > 3
-         echo "foo is big" *
-         let foo = 3
-      endif
-      call do_something_else()
-<
-we would more likely want to include the endif when we select the if
-structure.
-
+This plugin provides text objects targeting indent levels, which is mainly
+useful for working with whitespace-significant languages like Python. It also
+allows tageting single delimiting lines above and below the indent level, which
+is useful for languages with block end statements. It's a fork of
+http://github.com/michaeljsmith/vim-indent-object. The original was forked
+and rewritten to
+  - hopefully make the code clearer,
+  - add the blockwise objects that strip common indent from selection,
+  - allow the closing delimiter to be selected independently,
+  - handle mismatched delimiters better,
+  - and back all of this up with tests using Vader framework.
 
 ==============================================================================
-BLANK LINES                                               *indtobj-blanklines*
+                                                         *indent-object-usage*
+                                                      *indent-object-mappings*
+USAGE
 
-When scanning code blocks, the plugin usually ignores blank lines. There is an
-exception to this, however, when the block being selected is not indented. In
-this case if blank lines are ignored, then the entire file would be selected.
-Instead when code at the top level is being indented blank lines are
-considered to delimit the block.
+The plugin defines no default concrete mappings, only abstract <Plug> ones.
+There are 16 mappings in total. The kind of text object, or what is included in
+it, is controlled by three boolean values, yielding eight combinations. The
+flags are:
+  - whether to include opening delimiter,
+  - whether to include closing delimiter,
+  - whether the selection in linewise or blockwise.
 
-This exceptional behaviour can be disabled by executing the following line
+And each of those eight mappings is defined for two modes:
+  - visual mode (allowing for iteration and interaction),
+  - operator pending mode (so verbs like `d`, `c`, and so on work).
+
+All sixteen accept counts.
+
+The opening and closing delimiters for a selection with given indent level are
+defined as one line above and below having indent level smaller than the
+selection.
+
+The blockwise selection differs from the linewise selection in that the common
+indent (amount of indent equal to the indent level of the line found to be
+outermost in the selection) is stripped. They are useful for yanking code to be
+run in REPL. If you have used the mapping visually selected some range, you can
+toggle between linewise and blockwise selection types by issuing corresponding
+mapping of another type. Make sure to keep delimiters the same. For example
+after selecting a linewise range without delimiters, invoke a mapping for
+blockwise range without deilimiters, otherwise the selection will expand
+outwards.
+
+You can define your concrete mappings by putting that in your config, and
+tweaking to taste:
 >
-      :let g:indent_object_except_first_level = 0
-<
-(default is 1)
+    omap ii <Plug>(indent-object_linewise-none)
+    vmap ii <Plug>(indent-object_linewise-none)
+    omap ai <Plug>(indent-object_linewise-start)
+    vmap ai <Plug>(indent-object_linewise-start)
+    omap iI <Plug>(indent-object_linewise-end)
+    vmap iI <Plug>(indent-object_linewise-end)
+    omap aI <Plug>(indent-object_linewise-both)
+    vmap aI <Plug>(indent-object_linewise-both)
 
+    omap ibi <Plug>(indent-object_blockwise-none)
+    vmap ibi <Plug>(indent-object_blockwise-none)
+    omap abi <Plug>(indent-object_blockwise-start)
+    vmap abi <Plug>(indent-object_blockwise-start)
+    omap ibI <Plug>(indent-object_blockwise-end)
+    vmap ibI <Plug>(indent-object_blockwise-end)
+    omap abI <Plug>(indent-object_blockwise-both)
+    vmap abI <Plug>(indent-object_blockwise-both)
+<
+
+The plugin does not attempt to work when tabs are mixed with spaces.
 
 ==============================================================================
-ABOUT                                                          *indtobj-about*
+ABOUT                                                    *indent-object-about*
+
+NOTE: Apart from this paragraph, this section is preserved intact from the
+original. The git respository of the rewrite can be found at:
+https://github.com/urxvtcd/vim-indent-object
 
 vim-indent-object was written by Michael Smith <msmith@msmith.id.au>. The
 project repository is kept at:

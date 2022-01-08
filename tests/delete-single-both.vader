@@ -1,0 +1,20 @@
+Include: before.vader
+
+Given:
+  first line
+      second line
+      third line
+          fourth line
+      fifth line
+      sixth line
+  sevent line
+
+Do:
+  /fourth\<CR>
+  daI
+
+Expect:
+  first line
+      second line
+      sixth line
+  sevent line

@@ -1,0 +1,26 @@
+Include: before.vader
+
+Given:
+  first line
+      second line
+              third line
+              fourth line
+          fifth line
+  sixth line
+
+" Given:
+"   first line
+"           second line
+"               third line
+"               fourth line
+"       fifth line
+"   sixth line
+
+Do:
+  /third\<CR>
+  d2ii
+
+Expect:
+  first line
+      second line
+  sixth line

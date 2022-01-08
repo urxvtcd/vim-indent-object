@@ -1,0 +1,12 @@
+Include: before.vader
+
+Given:
+          first line
+      second line
+  third line
+
+Do:
+  d2ii
+
+Expect:
+  third line

@@ -24,6 +24,7 @@ and rewritten to
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
   - move from hardcoded mappings to `<Plug>` ones,
+  - use on-demand loading via vim's autoload feature,
   - and back all of this up with tests using Vader framework.
 
 ==============================================================================

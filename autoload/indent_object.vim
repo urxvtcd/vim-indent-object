@@ -25,26 +25,6 @@
 "
 "--------------------------------------------------------------------------------
 
-onoremap <Plug>(indent-object_linewise-none)  :<C-u>call <SID>handle_operator_mapping(0, 0, 0)<CR>
-vnoremap <Plug>(indent-object_linewise-none)  :<C-u>call <SID>handle_visual_mapping(0, 0, 0)<CR>
-onoremap <Plug>(indent-object_linewise-start) :<C-u>call <SID>handle_operator_mapping(1, 0, 0)<CR>
-vnoremap <Plug>(indent-object_linewise-start) :<C-u>call <SID>handle_visual_mapping(1, 0, 0)<CR>
-onoremap <Plug>(indent-object_linewise-end)   :<C-u>call <SID>handle_operator_mapping(0, 1, 0)<CR>
-vnoremap <Plug>(indent-object_linewise-end)   :<C-u>call <SID>handle_visual_mapping(0, 1, 0)<CR>
-onoremap <Plug>(indent-object_linewise-both)  :<C-u>call <SID>handle_operator_mapping(1, 1, 0)<CR>
-vnoremap <Plug>(indent-object_linewise-both)  :<C-u>call <SID>handle_visual_mapping(1, 1, 0)<CR>
-
-onoremap <Plug>(indent-object_blockwise-none)  :<C-u>call <SID>handle_operator_mapping(0, 0, 1)<CR>
-vnoremap <Plug>(indent-object_blockwise-none)  :<C-u>call <SID>handle_visual_mapping(0, 0, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-start) :<C-u>call <SID>handle_operator_mapping(1, 0, 1)<CR>
-vnoremap <Plug>(indent-object_blockwise-start) :<C-u>call <SID>handle_visual_mapping(1, 0, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-end)   :<C-u>call <SID>handle_operator_mapping(0, 1, 1)<CR>
-vnoremap <Plug>(indent-object_blockwise-end)   :<C-u>call <SID>handle_visual_mapping(0, 1, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_operator_mapping(1, 1, 1)<CR>
-vnoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_visual_mapping(1, 1, 1)<CR>
-
-vnoremap <Plug>(indent-object_repeat) :<C-u>call <SID>repeat_visual_mapping()<CR>
-
 let s:last_range = {
 			\ 'include_start': 0,
 			\ 'include_end': 0,
@@ -53,8 +33,8 @@ let s:last_range = {
 			\ 'end': -1,
 			\ }
 
-function! <SID>handle_operator_mapping(include_start, include_end, is_blockwise)
-	call <SID>expand_range(
+function! indent_object#handle_operator_mapping(include_start, include_end, is_blockwise)
+	call s:expand_range(
 				\ {
 					\ 'include_start': a:include_start,
 					\ 'include_end': a:include_end,
@@ -66,24 +46,24 @@ function! <SID>handle_operator_mapping(include_start, include_end, is_blockwise)
 					\ )
 endfunction
 
-function! <SID>handle_visual_mapping(include_start, include_end, is_blockwise)
-	call <SID>expand_range(
+function! indent_object#handle_visual_mapping(include_start, include_end, is_blockwise)
+	call s:expand_range(
 				\ {
 					\ 'include_start': a:include_start,
 					\ 'include_end': a:include_end,
 					\ 'is_blockwise': a:is_blockwise,
 					\ 'start': line("'<"),
 					\ 'end': line("'>"),
-				\ },
-				\ v:count1,
-				\ )
+					\ },
+					\ v:count1,
+					\ )
 endfunction
 
-function! <SID>repeat_visual_mapping()
-	call <SID>expand_range(s:last_range, v:count1)
+function! indent_object#repeat_visual_mapping()
+	call s:expand_range(s:last_range, v:count1)
 endfunction
 
-function! <SID>expand_range(initial_range, count)
+function! s:expand_range(initial_range, count)
 	let counts_to_go = a:count " Curiously, count isn't allowed as a name.
 	let range = copy(a:initial_range)
 

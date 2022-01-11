@@ -8,6 +8,7 @@ is useful for languages with block end statements. It's a fork of
 and rewritten to
   - hopefully make the code clearer,
   - add the blockwise objects that strip common indent from selection,
+  - add mapping repeating last visual selection,
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
   - move from hardcoded mappings to `<Plug>` ones,

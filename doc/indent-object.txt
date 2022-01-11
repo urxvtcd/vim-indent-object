@@ -20,6 +20,7 @@ http://github.com/michaeljsmith/vim-indent-object. The original was forked
 and rewritten to
   - hopefully make the code clearer,
   - add the blockwise objects that strip common indent from selection,
+  - add mapping repeating last visual selection,
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
   - move from hardcoded mappings to `<Plug>` ones,
@@ -31,9 +32,9 @@ and rewritten to
 USAGE
 
 The plugin defines no default concrete mappings, only abstract <Plug> ones.
-There are 16 mappings in total. The kind of text object, or what is included in
-it, is controlled by three boolean values, yielding eight combinations. The
-flags are:
+There are seventeen mappings in total. The kind of text object, or what is
+included in it, is controlled by three boolean values, yielding eight
+combinations. The flags are:
   - whether to include opening delimiter,
   - whether to include closing delimiter,
   - whether the selection in linewise or blockwise.
@@ -42,7 +43,10 @@ And each of those eight mappings is defined for two modes:
   - visual mode (allowing for iteration and interaction),
   - operator pending mode (so verbs like `d`, `c`, and so on work).
 
-All sixteen accept counts.
+The seventeenth mapping makes sense only in visual mode. It expands the
+selection range by repeating last invoked indent-object action.
+
+All of the mappings accept counts.
 
 The opening and closing delimiters for a selection with given indent level are
 defined as one line above and below having indent level smaller than the
@@ -78,6 +82,8 @@ tweaking to taste:
     vmap ibI <Plug>(indent-object_blockwise-end)
     omap abI <Plug>(indent-object_blockwise-both)
     vmap abI <Plug>(indent-object_blockwise-both)
+
+    vmap <C-o> <Plug>(indent-object_repeat)
 <
 
 The plugin does not attempt to work when tabs are mixed with spaces.

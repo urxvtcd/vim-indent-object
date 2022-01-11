@@ -8,9 +8,12 @@ Given (a three-level buffer with multi-line innermost level):
       fifth line
   sixth line
 
-Do (select the innermost level with opening delimiter, repeat, delete the selection):
+Do (select the innermost level, repeat, delete the selection):
   /third\<CR>
-  Vaiaid
+  Vii
+  \<C-o>
+  d
 
-Expect (only the outermost closing delimiter remains):
+Expect (only the outermost level remains):
+  first line
   sixth line

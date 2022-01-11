@@ -15,3 +15,4 @@ Before:
   vmap ibI <Plug>(indent-object_blockwise-end)
   omap abI <Plug>(indent-object_blockwise-both)
   vmap abI <Plug>(indent-object_blockwise-both)
+  vmap <C-o> <Plug>(indent-object_repeat)

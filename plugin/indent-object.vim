@@ -43,6 +43,8 @@ vnoremap <Plug>(indent-object_blockwise-end)   :<C-u>call <SID>handle_visual_map
 onoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_operator_mapping(1, 1, 1)<CR>
 vnoremap <Plug>(indent-object_blockwise-both)  :<C-u>call <SID>handle_visual_mapping(1, 1, 1)<CR>
 
+vnoremap <Plug>(indent-object_repeat) :<C-u>call <SID>repeat_visual_mapping()<CR>
+
 let s:last_range = {
 			\ 'include_start': 0,
 			\ 'include_end': 0,
@@ -75,6 +77,10 @@ function! <SID>handle_visual_mapping(include_start, include_end, is_blockwise)
 				\ },
 				\ v:count1,
 				\ )
+endfunction
+
+function! <SID>repeat_visual_mapping()
+	call <SID>expand_range(s:last_range, v:count1)
 endfunction
 
 function! <SID>expand_range(initial_range, count)

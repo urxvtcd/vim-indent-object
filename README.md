@@ -10,6 +10,7 @@ and rewritten to
   - add the blockwise objects that strip common indent from selection,
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
+  - move from hardcoded mappings to `<Plug>` ones,
   - and back all of this up with tests using Vader framework.
 
 ## Install

@@ -67,16 +67,18 @@ function! s:expand_range(initial_range, count)
 	let counts_to_go = a:count " Curiously, count isn't allowed as a name.
 	let range = copy(a:initial_range)
 
-	" If the start and end of range requested by user are the same as seen the
-	" last time, but it now also includes a delimiter that wasn't included
-	" before, we add that delimiter and consume a count.
 	if s:include_previously_excluded_delimiters(range)
+		" If the start and end of range requested by user are the same as seen the
+		" last time, but it now also includes a delimiter that wasn't included
+		" before, we add that delimiter and consume a count.
+
 		let counts_to_go -= 1
 
-	" Otherwise, if is_blockwise is the only field of range that changed, just
-	" consume a count, allowing user to toggle between the blockwise and
-	" linewise types of selection.
 	elseif s:only_blockwise_changed(range)
+		" Otherwise, if is_blockwise is the only field of range that changed, just
+		" consume a count, allowing user to toggle between the blockwise and
+		" linewise types of selection.
+
 		let counts_to_go -= 1
 	endif
 
@@ -93,13 +95,14 @@ function! s:expand_range(initial_range, count)
 
 	let indent = s:find_outermost_indent_in_range(range.start, range.end)
 
-	" If the range contained only blank lines, we need to look
-	" above and below it to determine the indent.
 	if indent == -1
+		" If the range contained only blank lines, we need to look
+		" above and below it to determine the indent.
+
 		let indent = s:find_innermost_indent_adjacent_to_range(range.start, range.end)
 
-		" Whole file is blank. Select all but the last line.
 		if indent == -1
+			" Whole file is blank. Select all but the last line.
 			let range.start = 1
 			let range.end = max([line('$') - 1, 1])
 			let counts_to_go = 0
@@ -160,19 +163,23 @@ function! s:include_previously_excluded_delimiters(range)
 	if a:range.start == s:last_range.start && a:range.end == s:last_range.end
 		let changed = 0
 
-		" If a delimiter wasn't previously included, or was and still is, we
-		" can include previously excluded opposing delimiter, if requested.
-		" Or conversely: if range *lost* a delimiter on one end, we assume user
-		" wants to expand the selection to reach further outward, and not just
-		" include previously excluded delimiter.
-		if !s:last_range.include_end || a:range.include_end
-			if !s:last_range.include_start && a:range.include_start
+		" We assume user doesn't want to expand the range outwards and just
+		" wants to include a delimiter that wasn't included before when both
+		" of the following conditions are true:
+		" - if that delimiter wasn't included before, and now is (duh);
+		" - the opposing delimiter either wasn't previously included, or was
+		"   and still is.
+		" Conversely, the second condition is: if range *lost* a delimiter on
+		" one end, we assume user wants to expand the selection to reach
+		" further outward, and not just include previously excluded delimiter.
+		if !s:last_range.include_start && a:range.include_start
+			if !s:last_range.include_end || a:range.include_end
 				let a:range.start -= 1
 				let changed = 1
 			endif
 		endif
-		if !s:last_range.include_start || a:range.include_start
-			if !s:last_range.include_end && a:range.include_end
+		if !s:last_range.include_end && a:range.include_end
+			if !s:last_range.include_start || a:range.include_start
 				let a:range.end = nextnonblank(a:range.end + 1)
 				let changed = 1
 			endif
@@ -188,11 +195,10 @@ function! s:include_previously_excluded_delimiters(range)
 endfunction
 
 function! s:fix_delimiters(range)
-	" In a far-fetched case that user requested to include a delimiting
-	" line, and its indent was smaller than that of the opposing
-	" delimiting line, do not include the line. In other words: include
-	" flag for a line only applies when that line actually delimits this
-	" indent block.
+	" In a far-fetched case that user requested to include a delimiting line,
+	" and its indent was smaller than that of the opposing delimiting line, do
+	" not include the line. In other words: include flag for a line only
+	" applies when that line actually delimits this indent block.
 	if a:range.include_start
 		let closing_line = a:range.include_end ? a:range.end : nextnonblank(a:range.end + 1)
 		let closing_indent = indent(closing_line)

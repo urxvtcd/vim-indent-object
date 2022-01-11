@@ -1,6 +1,6 @@
 Include: before.vader
 
-Given:
+Given (a four-level buffer with innermost level without opening delimiter):
   first line
       second line
               third line
@@ -8,11 +8,11 @@ Given:
           fifth line
   sixth line
 
-Do:
+Do (delete the innermost level and opening delimiter):
   /third\<CR>
   dai
 
-Expect:
+Expect (deleted text doesn't include line above the innermost level that doesn't delimit it):
   first line
       second line
           fifth line

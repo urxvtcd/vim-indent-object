@@ -1,6 +1,6 @@
 Include: before.vader
 
-Given:
+Given (a three-level buffer with multi-line innermost level):
   first line
       second line
           third line
@@ -8,11 +8,11 @@ Given:
       fifth line
   sixth line
 
-Do:
+Do (delete the innermost level):
   /third\<CR>
   dii
 
-Expect:
+Expect (the innermost level is deleted):
   first line
       second line
       fifth line

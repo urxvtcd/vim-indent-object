@@ -1,6 +1,6 @@
 Include: before.vader
 
-Given (multi-line indent with blank line):
+Given (a three-level buffer with multi-line innermost level starting with blank line):
   first line
       second line
 
@@ -9,12 +9,11 @@ Given (multi-line indent with blank line):
       fifth line
   sixth line
 
-Do (move to blank line in multi-line indent, and delete inner indent):
+Do (remove the innermost level):
   /third\<CR>
-  j
   dii
 
-Expect (multi-line indent deleted):
+Expect (the innermost level including blank line is deleted):
   first line
       second line
       fifth line

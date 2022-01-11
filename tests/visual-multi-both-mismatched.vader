@@ -1,0 +1,20 @@
+Include: before.vader
+
+Given (a four-level buffer with innermost level without closing delimiter):
+  first line
+      second line
+          third line
+              fourth line
+              fifth line
+      sixth line
+  seventh line
+
+Do (select the innermost level with both delimiters, delete the selection):
+  /fourth\<CR>
+  VaId
+
+Expect (deleted selection doesn't include line below the innermost level that doesn't delimit it):
+  first line
+      second line
+      sixth line
+  seventh line

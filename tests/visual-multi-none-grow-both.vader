@@ -1,6 +1,6 @@
 Include: before.vader
 
-Given:
+Given (a three-level buffer with multi-line innermost level):
   first line
       second line
           third line
@@ -8,10 +8,10 @@ Given:
       fifth line
   sixth line
 
-Do:
+Do (select the innermost level, include both delimiters, delete the selection):
   /third\<CR>
   ViiaId
 
-Expect:
+Expect (only outermost level remains):
   first line
   sixth line

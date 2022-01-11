@@ -1,12 +1,16 @@
 Include: before.vader
 
-Given:
+Given (a buffer starting on the innermost level):
           first line
-      second line
-  third line
+          second line
+      third line
+      fourth line
+  fifth line
+  sixth line
 
-Do:
+Do (remove two levels):
   d2ii
 
-Expect:
-  third line
+Expect (the two innermost levels are deleted):
+  fifth line
+  sixth line

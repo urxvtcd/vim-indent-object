@@ -1,6 +1,6 @@
 Include: before.vader
 
-Given:
+Given (a three-level buffer with single-line innermost level):
   first line
       second line
       third line
@@ -9,10 +9,11 @@ Given:
       sixth line
   seventh line
 
-Do:
+
+Do (remove the two innermost levels):
   /fourth\<CR>
   d2ii
 
-Expect:
+Expect (only the outermost level remains):
   first line
   seventh line

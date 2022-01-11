@@ -14,7 +14,7 @@ INTRODUCTION                                      *indent-object-introduction*
 
 This plugin provides text objects targeting indent levels, which is mainly
 useful for working with whitespace-significant languages like Python. It also
-allows tageting single delimiting lines above and below the indent level, which
+allows targeting single delimiting lines above and below the indent level, which
 is useful for languages with block end statements. It's a fork of
 http://github.com/michaeljsmith/vim-indent-object. The original was forked
 and rewritten to
@@ -32,14 +32,15 @@ and rewritten to
 USAGE
 
 The plugin defines no default concrete mappings, only abstract <Plug> ones.
-There are seventeen mappings in total. The kind of text object, or what is
+You can define up to seventeen mappings. The kind of text object, or what is
 included in it, is controlled by three boolean values, yielding eight
 combinations. The flags are:
   - whether to include opening delimiter,
   - whether to include closing delimiter,
-  - whether the selection in linewise or blockwise.
+  - whether the selection is linewise or blockwise.
 
-And each of those eight mappings is defined for two modes:
+Each of those eight mappings can be invoked from either of the two following
+modes, increasing the number to sixteen:
   - visual mode (allowing for iteration and interaction),
   - operator pending mode (so verbs like `d`, `c`, and so on work).
 
@@ -48,22 +49,28 @@ selection range by repeating last invoked indent-object action.
 
 All of the mappings accept counts.
 
+For an initial invocation, the indent level is the indent level of the current
+line in normal mode, or the outermost indent level in the selection in visual
+mode.
+
 The opening and closing delimiters for a selection with given indent level are
 defined as one line above and below having indent level smaller than the
 selection.
 
 The blockwise selection differs from the linewise selection in that the common
 indent (amount of indent equal to the indent level of the line found to be
-outermost in the selection) is stripped. They are useful for yanking code to be
-run in REPL. If you have used the mapping visually selected some range, you can
-toggle between linewise and blockwise selection types by issuing corresponding
-mapping of another type. Make sure to keep delimiters the same. For example
-after selecting a linewise range without delimiters, invoke a mapping for
-blockwise range without deilimiters, otherwise the selection will expand
-outwards.
+outermost in the selection) is stripped. It is useful for yanking code, to be
+run in REPL for example. If you have used the mapping visually selected some
+range, you can toggle between linewise and blockwise selection types by
+issuing corresponding mapping of another type. If you want to do so, make sure
+to keep flags for delimiters the same. For example after selecting a linewise
+range without delimiters, invoke a mapping for blockwise range without
+delimiters, otherwise the selection will expand outwards.
 
-You can define your concrete mappings by putting that in your config, and
-tweaking to taste:
+You can define your concrete mappings by putting any number of lines from the
+following snippet in your config, and tweaking keys to taste. The suffix
+("none", "start", "end", or "both") determines which indent delimiters will be
+included in the selection.
 >
     omap ii <Plug>(indent-object_linewise-none)
     vmap ii <Plug>(indent-object_linewise-none)
@@ -85,14 +92,14 @@ tweaking to taste:
 
     vmap <C-o> <Plug>(indent-object_repeat)
 <
-
-The plugin does not attempt to work when tabs are mixed with spaces.
+The plugin seems to be working fine in scenarios with tabs mixed with spaces,
+however this is not actively tested for. Feel free to report weird behaviors.
 
 ==============================================================================
 ABOUT                                                    *indent-object-about*
 
 NOTE: Apart from this paragraph, this section is preserved intact from the
-original. The git respository of the rewrite can be found at:
+original. The git repository of the rewrite can be found at:
 https://github.com/urxvtcd/vim-indent-object
 
 vim-indent-object was written by Michael Smith <msmith@msmith.id.au>. The

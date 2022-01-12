@@ -57,17 +57,24 @@ mode.
 
 The opening and closing delimiters for a selection with given indent level are
 defined as one line above and below having indent level smaller than the
-selection.
+selection. If the delimiters have different indent, only the one with smaller
+indent is taken into account, and the other one is assumed missing. If you used
+one of the mappings to visually select some range without delimiters, you can
+include one or both delimiters without expanding outward by invoking a mapping
+flipping the delimiter flags from true to false. If both are flipped like this,
+both range ends will move, if just one one of them and the other is kept the
+same, one end will move.
 
 The blockwise selection differs from the linewise selection in that the common
 indent (amount of indent equal to the indent level of the line found to be
 outermost in the selection) is stripped. It is useful for yanking code, to be
-run in REPL for example. If you have used the mapping visually selected some
-range, you can toggle between linewise and blockwise selection types by
-issuing corresponding mapping of another type. If you want to do so, make sure
-to keep flags for delimiters the same. For example after selecting a linewise
-range without delimiters, invoke a mapping for blockwise range without
-delimiters, otherwise the selection will expand outwards.
+run in REPL for example. If you have used one of the mappings to visually
+select some range, you can toggle between linewise and blockwise selection
+types by issuing corresponding mapping of another type. "Corresponding" in this
+context means you need to keep flags for delimiters the same. For example,
+after selecting a linewise range without delimiters, invoke a mapping for
+blockwise range without delimiters, otherwise the selection will expand
+outwards.
 
 You can define your concrete mappings by putting any number of lines from the
 following snippet in your config, and tweaking keys to taste. The suffix

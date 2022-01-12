@@ -25,22 +25,22 @@
 "
 "--------------------------------------------------------------------------------
 
-onoremap <Plug>(indent-object_linewise-none)  :<C-u>call indent_object#handle_operator_mapping(0, 0, 0)<CR>
-xnoremap <Plug>(indent-object_linewise-none)  :<C-u>call indent_object#handle_visual_mapping(0, 0, 0)<CR>
-onoremap <Plug>(indent-object_linewise-start) :<C-u>call indent_object#handle_operator_mapping(1, 0, 0)<CR>
-xnoremap <Plug>(indent-object_linewise-start) :<C-u>call indent_object#handle_visual_mapping(1, 0, 0)<CR>
-onoremap <Plug>(indent-object_linewise-end)   :<C-u>call indent_object#handle_operator_mapping(0, 1, 0)<CR>
-xnoremap <Plug>(indent-object_linewise-end)   :<C-u>call indent_object#handle_visual_mapping(0, 1, 0)<CR>
-onoremap <Plug>(indent-object_linewise-both)  :<C-u>call indent_object#handle_operator_mapping(1, 1, 0)<CR>
-xnoremap <Plug>(indent-object_linewise-both)  :<C-u>call indent_object#handle_visual_mapping(1, 1, 0)<CR>
+onoremap <silent> <Plug>(indent-object_linewise-none)  :<C-u>call indent_object#handle_operator_mapping(0, 0, 0)<CR>
+xnoremap <silent> <Plug>(indent-object_linewise-none)  :<C-u>call indent_object#handle_visual_mapping(0, 0, 0)<CR>
+onoremap <silent> <Plug>(indent-object_linewise-start) :<C-u>call indent_object#handle_operator_mapping(1, 0, 0)<CR>
+xnoremap <silent> <Plug>(indent-object_linewise-start) :<C-u>call indent_object#handle_visual_mapping(1, 0, 0)<CR>
+onoremap <silent> <Plug>(indent-object_linewise-end)   :<C-u>call indent_object#handle_operator_mapping(0, 1, 0)<CR>
+xnoremap <silent> <Plug>(indent-object_linewise-end)   :<C-u>call indent_object#handle_visual_mapping(0, 1, 0)<CR>
+onoremap <silent> <Plug>(indent-object_linewise-both)  :<C-u>call indent_object#handle_operator_mapping(1, 1, 0)<CR>
+xnoremap <silent> <Plug>(indent-object_linewise-both)  :<C-u>call indent_object#handle_visual_mapping(1, 1, 0)<CR>
 
-onoremap <Plug>(indent-object_blockwise-none)  :<C-u>call indent_object#handle_operator_mapping(0, 0, 1)<CR>
-xnoremap <Plug>(indent-object_blockwise-none)  :<C-u>call indent_object#handle_visual_mapping(0, 0, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-start) :<C-u>call indent_object#handle_operator_mapping(1, 0, 1)<CR>
-xnoremap <Plug>(indent-object_blockwise-start) :<C-u>call indent_object#handle_visual_mapping(1, 0, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-end)   :<C-u>call indent_object#handle_operator_mapping(0, 1, 1)<CR>
-xnoremap <Plug>(indent-object_blockwise-end)   :<C-u>call indent_object#handle_visual_mapping(0, 1, 1)<CR>
-onoremap <Plug>(indent-object_blockwise-both)  :<C-u>call indent_object#handle_operator_mapping(1, 1, 1)<CR>
-xnoremap <Plug>(indent-object_blockwise-both)  :<C-u>call indent_object#handle_visual_mapping(1, 1, 1)<CR>
+onoremap <silent> <Plug>(indent-object_blockwise-none)  :<C-u>call indent_object#handle_operator_mapping(0, 0, 1)<CR>
+xnoremap <silent> <Plug>(indent-object_blockwise-none)  :<C-u>call indent_object#handle_visual_mapping(0, 0, 1)<CR>
+onoremap <silent> <Plug>(indent-object_blockwise-start) :<C-u>call indent_object#handle_operator_mapping(1, 0, 1)<CR>
+xnoremap <silent> <Plug>(indent-object_blockwise-start) :<C-u>call indent_object#handle_visual_mapping(1, 0, 1)<CR>
+onoremap <silent> <Plug>(indent-object_blockwise-end)   :<C-u>call indent_object#handle_operator_mapping(0, 1, 1)<CR>
+xnoremap <silent> <Plug>(indent-object_blockwise-end)   :<C-u>call indent_object#handle_visual_mapping(0, 1, 1)<CR>
+onoremap <silent> <Plug>(indent-object_blockwise-both)  :<C-u>call indent_object#handle_operator_mapping(1, 1, 1)<CR>
+xnoremap <silent> <Plug>(indent-object_blockwise-both)  :<C-u>call indent_object#handle_visual_mapping(1, 1, 1)<CR>
 
-xnoremap <Plug>(indent-object_repeat) :<C-u>call indent_object#repeat_visual_mapping()<CR>
+xnoremap <silent> <Plug>(indent-object_repeat) :<C-u>call indent_object#repeat_visual_mapping()<CR>

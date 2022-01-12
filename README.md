@@ -14,6 +14,7 @@ and rewritten to
   - handle mismatched delimiters better,
   - move from hardcoded mappings to `<Plug>` ones,
   - use on-demand loading via vim's autoload feature,
+  - move from vmap and vnoremap to xmap and xnoremap,
   - and back all of this up with tests using
     [Vader](https://github.com/junegunn/vader.vim) framework.
 

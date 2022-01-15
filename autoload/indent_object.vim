@@ -90,6 +90,8 @@ function! s:expand_range(initial_range, count)
 	" consisting of a single line should only delete that line, and not spill
 	" outwards. In the second case, we need to expand outwards, or else
 	" growing the selection iteratively in visual mode would not work.
+	" If the supplied selection does not contain all the lines on given level,
+	" the main loop later will discover that, and flip the flag.
 	let should_expand_outward = range == s:last_range
 
 	let indent = s:find_outermost_indent_in_range(range.start, range.end)

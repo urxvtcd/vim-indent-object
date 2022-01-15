@@ -141,7 +141,7 @@ function! s:expand_range(initial_range, count)
 
 	let s:last_range = range
 
-	call s:set_cursor(range, indent)
+	call s:set_visual_selection(range, indent)
 endfunction
 
 function! s:only_blockwise_changed(range)
@@ -217,7 +217,7 @@ function! s:fix_delimiters(range)
 	endif
 endfunction
 
-function! s:set_cursor(range, outermost_indent)
+function! s:set_visual_selection(range, outermost_indent)
 	if &expandtab
 		let outermost_first_char_column = a:outermost_indent + 1
 	else

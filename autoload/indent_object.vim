@@ -86,11 +86,10 @@ function! s:expand_range(initial_range, count)
 	" or greater indent level as the outermost indent found in the selection,
 	" we need to differentiate whether the selection was created manually by
 	" user, or by our previous invocation. In the first case, we should leave
-	" the selection untouched. Rationale: "dii" invoked on an indent
+	" the selection untouched. Rationale: mapping to delete and indent level
 	" consisting of a single line should only delete that line, and not spill
 	" outwards. In the second case, we need to expand outwards, or else
-	" growing the selection with consecutive "ii"s in visual mode would not
-	" work.
+	" growing the selection iteratively in visual mode would not work.
 	let should_expand_outward = range == s:last_range
 
 	let indent = s:find_outermost_indent_in_range(range.start, range.end)

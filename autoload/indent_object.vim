@@ -74,7 +74,7 @@ function! s:expand_range(initial_range, count)
 
 		let counts_to_go -= 1
 
-	elseif s:only_blockwise_changed(range)
+	elseif s:dicts_only_differ_in(s:last_range, range, 'is_blockwise')
 		" Otherwise, if is_blockwise is the only field of range that changed, just
 		" consume a count, allowing user to toggle between the blockwise and
 		" linewise types of selection.
@@ -140,24 +140,7 @@ function! s:expand_range(initial_range, count)
 	endwhile
 
 	let s:last_range = range
-
 	call s:set_visual_selection(range, indent)
-endfunction
-
-function! s:only_blockwise_changed(range)
-	if s:last_range.is_blockwise == a:range.is_blockwise
-		return 0
-	elseif s:last_range.start != a:range.start
-		return 0
-	elseif s:last_range.end != a:range.end
-		return 0
-	elseif s:last_range.include_start != a:range.include_start
-		return 0
-	elseif s:last_range.include_end != a:range.include_end
-		return 0
-	endif
-
-	return 1
 endfunction
 
 function! s:include_previously_excluded_delimiters(range)
@@ -285,6 +268,23 @@ function! s:find_outermost_indent_in_range(start, end)
 
 	" return -1 if all lines in range are blank
 	return found ? indent : -1
+endfunction
+
+function! s:dicts_only_differ_in(first, second, different)
+	" Note: we assume both dicts have the same keys.
+	for [key, value] in items(a:first)
+		if key == a:different
+			if value == a:second[key]
+				return 0
+			endif
+		else
+			if value != a:second[key]
+				return 0
+			endif
+		endif
+	endfor
+
+	return 1
 endfunction
 
 function! s:is_blank(lnum)

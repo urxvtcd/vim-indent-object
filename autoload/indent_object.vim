@@ -29,16 +29,18 @@ let s:last_range = {
             \ 'include_start': 0,
             \ 'include_end': 0,
             \ 'is_blockwise': 0,
+            \ 'keep': '',
             \ 'start': -1,
             \ 'end': -1,
             \ }
 
-function! indent_object#handle_operator_mapping(include_start, include_end, is_blockwise)
+function! indent_object#handle_operator_mapping(include_start, include_end, is_blockwise, keep)
     call s:expand_range(
                 \ {
                     \ 'include_start': a:include_start,
                     \ 'include_end': a:include_end,
                     \ 'is_blockwise': a:is_blockwise,
+                    \ 'keep': a:keep,
                     \ 'start': line("."),
                     \ 'end': line("."),
                     \ },
@@ -46,12 +48,13 @@ function! indent_object#handle_operator_mapping(include_start, include_end, is_b
                     \ )
 endfunction
 
-function! indent_object#handle_visual_mapping(include_start, include_end, is_blockwise)
+function! indent_object#handle_visual_mapping(include_start, include_end, is_blockwise, keep)
     call s:expand_range(
                 \ {
                     \ 'include_start': a:include_start,
                     \ 'include_end': a:include_end,
                     \ 'is_blockwise': a:is_blockwise,
+                    \ 'keep': a:keep,
                     \ 'start': line("'<"),
                     \ 'end': line("'>"),
                     \ },
@@ -67,21 +70,6 @@ function! s:expand_range(initial_range, count)
     let counts_to_go = a:count " Curiously, count isn't allowed as a name.
     let range = copy(a:initial_range)
 
-    if s:include_previously_excluded_delimiters(range)
-        " If the start and end of range requested by user are the same as seen the
-        " last time, but it now also includes a delimiter that wasn't included
-        " before, we add that delimiter and consume a count.
-
-        let counts_to_go -= 1
-
-    elseif s:dicts_only_differ_in(s:last_range, range, 'is_blockwise')
-        " Otherwise, if is_blockwise is the only field of range that changed, just
-        " consume a count, allowing user to toggle between the blockwise and
-        " linewise types of selection.
-
-        let counts_to_go -= 1
-    endif
-
     " If the supplied selection already contains all the lines having the same
     " or greater indent level as the outermost indent found in the selection,
     " we need to differentiate whether the selection was created manually by
@@ -90,9 +78,48 @@ function! s:expand_range(initial_range, count)
     " consisting of a single line should only delete that line, and not spill
     " outwards. In the second case, we need to expand outwards, or else
     " growing the selection iteratively in visual mode would not work.
-    " If the supplied selection does not contain all the lines on given level,
-    " the main loop later will discover that, and flip the flag.
-    let should_expand_outward = range == s:last_range
+    " We initialize the flag with false and toggle it when necessary.
+    let should_expand_outward = 0
+
+    if range == s:last_range
+        let should_expand_outward = 1
+
+    elseif s:dicts_only_differ_in(s:last_range, range, ['keep'])
+        " If user requests to to expand previous selection, this time keeping
+        " one of its ends in place, we need to toggle the flag just like if
+        " the two selections were the same (because they are, it's request
+        " that's different).
+
+        let should_expand_outward = 1
+
+    elseif range.keep != "" && s:dicts_only_differ_in(s:last_range, range, [range.keep])
+        " Both this and last run set "keep" flag to either "start" or "end".
+        " Our algorithm ignores the flag during expansion phase, and takes it
+        " into account only at the end, to set the visual selection. Because
+        " of that, indent's start or end registered by the previous invocation
+        " is different from the visual selection's start or end we got now,
+        " and we need to:
+        " - recall where the indent level starts or ends,
+        " - toggle the flag just like if the two selections were the same,
+        "   because -- internally -- they are.
+
+        let range[range.keep] = s:last_range[range.keep]
+        let should_expand_outward = 1
+
+    elseif s:include_previously_excluded_delimiters(range)
+        " If the start and end of range requested by user are the same as seen the
+        " last time, but it now also includes a delimiter that wasn't included
+        " before, we add that delimiter and consume a count.
+
+        let counts_to_go -= 1
+
+    elseif s:dicts_only_differ_in(s:last_range, range, ['is_blockwise'])
+        " Otherwise, if is_blockwise is the only field of range that changed, just
+        " consume a count, allowing user to toggle between the blockwise and
+        " linewise types of selection.
+
+        let counts_to_go -= 1
+    endif
 
     let indent = s:find_outermost_indent_in_range(range.start, range.end)
 
@@ -139,8 +166,15 @@ function! s:expand_range(initial_range, count)
         endif
     endwhile
 
+    if range.keep == "start"
+        call s:set_visual_selection(a:initial_range.start, range.end, range.is_blockwise, indent)
+    elseif range.keep == "end"
+        call s:set_visual_selection(range.start, a:initial_range.end, range.is_blockwise, indent)
+    else
+        call s:set_visual_selection(range.start, range.end, range.is_blockwise, indent)
+    endif
+
     let s:last_range = range
-    call s:set_visual_selection(range, indent)
 endfunction
 
 function! s:include_previously_excluded_delimiters(range)
@@ -200,22 +234,22 @@ function! s:fix_delimiters(range)
     endif
 endfunction
 
-function! s:set_visual_selection(range, outermost_indent)
+function! s:set_visual_selection(start, end, is_blockwise, outermost_indent)
     if &expandtab
         let outermost_first_char_column = a:outermost_indent + 1
     else
         let outermost_first_char_column = (a:outermost_indent / &tabstop) + 1
     endif
 
-    call cursor(a:range.end, outermost_first_char_column)
+    call cursor(a:end, outermost_first_char_column)
 
-    if a:range.is_blockwise
+    if a:is_blockwise
         exe "normal! \<C-v>"
-        call cursor(a:range.start, outermost_first_char_column)
+        call cursor(a:start, outermost_first_char_column)
         exe "normal! _O$"
     else
         exe "normal! V"
-        call cursor(a:range.start, outermost_first_char_column)
+        call cursor(a:start, outermost_first_char_column)
     endif
 endfunction
 
@@ -273,7 +307,7 @@ endfunction
 function! s:dicts_only_differ_in(first, second, different)
     " Note: we assume both dicts have the same keys.
     for [key, value] in items(a:first)
-        if key == a:different
+        if count(a:different, key) != 0
             if value == a:second[key]
                 return 0
             endif

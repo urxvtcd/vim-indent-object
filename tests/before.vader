@@ -17,4 +17,24 @@ Before:
   omap abI <Plug>(indent-object_blockwise-both)
   xmap abI <Plug>(indent-object_blockwise-both)
 
+  omap ij <Plug>(indent-object_linewise-none-keep-start)
+  xmap ij <Plug>(indent-object_linewise-none-keep-start)
+  omap iJ <Plug>(indent-object_linewise-end-keep-start)
+  xmap iJ <Plug>(indent-object_linewise-end-keep-start)
+
+  omap ik <Plug>(indent-object_linewise-none-keep-end)
+  xmap ik <Plug>(indent-object_linewise-none-keep-end)
+  omap iK <Plug>(indent-object_linewise-start-keep-end)
+  xmap iK <Plug>(indent-object_linewise-start-keep-end)
+
+  omap ibj <Plug>(indent-object_blockwise-none-keep-start)
+  xmap ibj <Plug>(indent-object_blockwise-none-keep-start)
+  omap ibJ <Plug>(indent-object_blockwise-end-keep-start)
+  xmap ibJ <Plug>(indent-object_blockwise-end-keep-start)
+
+  omap ibk <Plug>(indent-object_blockwise-none-keep-end)
+  xmap ibk <Plug>(indent-object_blockwise-none-keep-end)
+  omap ibK <Plug>(indent-object_blockwise-start-keep-end)
+  xmap ibK <Plug>(indent-object_blockwise-start-keep-end)
+
   xmap <C-o> <Plug>(indent-object_repeat)

@@ -117,6 +117,54 @@ Example:
     omap aI <Plug>(indent-object_linewise-both)
 <
 ------------------------------------------------------------------------------
+                                             *indent-object-keep-end-mappings*
+                              *<Plug>(indent-object_linewise-none-keep-start)*
+                               *<Plug>(indent-object_linewise-end-keep-start)*
+                                *<Plug>(indent-object_linewise-none-keep-end)*
+                               *<Plug>(indent-object_linewise-start-keep-end)*
+                             *<Plug>(indent-object_blockwise-none-keep-start)*
+                              *<Plug>(indent-object_blockwise-end-keep-start)*
+                               *<Plug>(indent-object_blockwise-none-keep-end)*
+                              *<Plug>(indent-object_blockwise-start-keep-end)*
+
+The "keep end" mappings are mappings that expand selection only in one way,
+upward or downward. There are four linewise text objects for "keep end"
+mappings: two basic ones, and two delimiter ones:
+  - keep start the same, and go down
+  - keep start the same, and go down, including an ending delimiter
+  - keep end the same, and go up
+  - keep end the same, and go up, inluding a starting delimiter
+
+Example of basic mappings:
+>
+    omap ij <Plug>(indent-object_linewise-none-keep-start)
+    xmap ij <Plug>(indent-object_linewise-none-keep-start)
+    omap ik <Plug>(indent-object_linewise-none-keep-end)
+    xmap ik <Plug>(indent-object_linewise-none-keep-end)
+<
+
+Example of delimiter mappings:
+>
+    omap iJ <Plug>(indent-object_linewise-end-keep-start)
+    xmap iJ <Plug>(indent-object_linewise-end-keep-start)
+    omap iK <Plug>(indent-object_linewise-start-keep-end)
+    xmap iK <Plug>(indent-object_linewise-start-keep-end)
+<
+
+The linewise mappings have their blockwise companions. Example:
+>
+    omap ibj <Plug>(indent-object_blockwise-none-keep-start)
+    xmap ibj <Plug>(indent-object_blockwise-none-keep-start)
+    omap ibJ <Plug>(indent-object_blockwise-end-keep-start)
+    xmap ibJ <Plug>(indent-object_blockwise-end-keep-start)
+
+    omap ibk <Plug>(indent-object_blockwise-none-keep-end)
+    xmap ibk <Plug>(indent-object_blockwise-none-keep-end)
+    omap ibK <Plug>(indent-object_blockwise-start-keep-end)
+    xmap ibK <Plug>(indent-object_blockwise-start-keep-end)
+>
+
+------------------------------------------------------------------------------
                                                 *<Plug>(indent-object_repeat)*
 
 This mapping expands the selection range by repeating last invoked

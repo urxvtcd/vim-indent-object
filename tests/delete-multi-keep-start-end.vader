@@ -1,0 +1,16 @@
+Include: before.vader
+
+Given (a buffer with multiline innermost level):
+  first
+      second
+      third
+      fourth
+  fifth
+
+Do (delete from middle till the end of level with closing delimiter):
+  /third\<CR>
+  diJ
+
+Expect (all lines from the cursor are deleted):
+  first
+      second

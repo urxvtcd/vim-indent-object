@@ -1,3 +1,5 @@
+Include: before.vader
+
 Given (a three-level buffer):
   first line
       second line

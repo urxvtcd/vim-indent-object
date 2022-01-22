@@ -1,0 +1,28 @@
+Include: before.vader
+
+Given (a buffer with multiline innermost level):
+  first
+      second
+      third
+          fourth
+          fifth
+          sixth
+      seventh
+      eighth
+  ninth
+
+Do:
+" place cursor at the start of the innermost indent level
+  /fourth\<CR>
+" enter linewise visual selection
+  V
+" expand the selection down, keeping current line as start of the selection
+  ij
+" expand the selection to another level
+  ii
+" delete
+  d
+
+Expect (two innermost levels are deleted):
+  first
+  ninth

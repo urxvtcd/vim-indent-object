@@ -1,0 +1,31 @@
+
+Include: before.vader
+
+Given (a two-level buffer with the inner level surrounded by blank lines):
+  first line
+
+      second line
+      third line
+
+  fourth line
+
+Do:
+  /second\<CR>
+# select the innermost indent blockwise
+  vibi
+# expand blockwise
+  \<C-o>
+# yank
+  y
+# remove everything
+  ggdG
+# paste yanked
+  "0p
+
+Expect (everything was pasted back after deletion):
+  first line
+
+      second line
+      third line
+
+  fourth line

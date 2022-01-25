@@ -1,0 +1,19 @@
+Include: before.vader
+
+Given (a two-level buffer with the inner level surrounded by blank lines):
+  first line
+
+      second line
+      third line
+
+  fourth line
+
+Do (yank the inner indent blockwise, remove everything, paste yanked):
+  /second\<CR>
+  yibi
+  ggdG
+  "0p
+
+Expect (no blank lines were present in yanked level):
+  second line
+  third line

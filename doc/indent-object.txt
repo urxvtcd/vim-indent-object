@@ -62,10 +62,8 @@ to be run in REPL for example. If you have used one of the mappings to visually
 select some range, you can toggle between linewise and blockwise selection
 types by issuing corresponding mapping of another type.
 
-A known issue, that's planned to be fixed in future: Because the blank lines
-are included in the selection, and blockwise mappings will include them as
-well, there will be no common indent to be stripped, and you'll have to
-manipulate the selection yourself.
+In blockwise mode, leading and trailing blank lines are not included in the
+selection, as they make it impossible to strip leading indent.
 
 ------------------------------------------------------------------------------
                                                 *indent-object-basic-mappings*

@@ -70,6 +70,21 @@ function! s:expand_range(initial_range, count)
     let counts_to_go = a:count " Curiously, count isn't allowed as a name.
     let range = copy(a:initial_range)
 
+    if s:last_range.is_blockwise
+        if nextnonblank(s:last_range.start) == range.start
+            if prevnonblank(s:last_range.end) == range.end
+                " We want the blockwise selection not to include leading and
+                " trailing blank lines, because they cause the indent common
+                " to all lines in selection to be zero. To fix this, at the
+                " end of the previous run we trimmed them from the visual
+                " selection, but did not modify the s:last_range, so we can
+                " now recover the real range.
+                let range.start = s:last_range.start
+                let range.end = s:last_range.end
+            endif
+        endif
+    endif
+
     " If the supplied selection already contains all the lines having the same
     " or greater indent level as the outermost indent found in the selection,
     " we need to differentiate whether the selection was created manually by
@@ -175,6 +190,7 @@ function! s:expand_range(initial_range, count)
     endif
 
     let s:last_range = range
+
 endfunction
 
 function! s:include_previously_excluded_delimiters(range)
@@ -235,6 +251,9 @@ function! s:fix_delimiters(range)
 endfunction
 
 function! s:set_visual_selection(start, end, is_blockwise, outermost_indent)
+    let start = a:is_blockwise ? nextnonblank(a:start) : a:start
+    let end = a:is_blockwise ? prevnonblank(a:end) : a:end
+
     if &expandtab
         let outermost_first_char_column = a:outermost_indent + 1
     else
@@ -245,11 +264,11 @@ function! s:set_visual_selection(start, end, is_blockwise, outermost_indent)
 
     if a:is_blockwise
         exe "normal! \<C-v>"
-        call cursor(a:start, outermost_first_char_column)
+        call cursor(start, outermost_first_char_column)
         exe "normal! _O$"
     else
         exe "normal! V"
-        call cursor(a:start, outermost_first_char_column)
+        call cursor(start, outermost_first_char_column)
     endif
 endfunction
 

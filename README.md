@@ -19,6 +19,10 @@ and rewritten to
   - and back all of this up with tests using
     [Vader](https://github.com/junegunn/vader.vim) framework.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/465213.svg)](https://asciinema.org/a/465213?autoplay=1)
+
 ## Install
 
 You know how to do it.

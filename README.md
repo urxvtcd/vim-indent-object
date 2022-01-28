@@ -10,6 +10,7 @@ and rewritten to
   - hopefully make the code clearer,
   - add the blockwise objects that strip common indent from selection,
   - add mapping repeating last visual selection,
+  - add mappings expanding one end of selection and keeping the other the same
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
   - move from hardcoded mappings to `<Plug>` ones,

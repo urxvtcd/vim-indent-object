@@ -182,11 +182,11 @@ function! s:expand_range(initial_range, count)
     endwhile
 
     if range.keep == "start"
-        call s:set_visual_selection(a:initial_range.start, range.end, range.is_blockwise, indent)
+        call s:set_visual_selection(a:initial_range.start, range.end, range.is_blockwise)
     elseif range.keep == "end"
-        call s:set_visual_selection(range.start, a:initial_range.end, range.is_blockwise, indent)
+        call s:set_visual_selection(range.start, a:initial_range.end, range.is_blockwise)
     else
-        call s:set_visual_selection(range.start, range.end, range.is_blockwise, indent)
+        call s:set_visual_selection(range.start, range.end, range.is_blockwise)
     endif
 
     let s:last_range = range
@@ -250,14 +250,16 @@ function! s:fix_delimiters(range)
     endif
 endfunction
 
-function! s:set_visual_selection(start, end, is_blockwise, outermost_indent)
+function! s:set_visual_selection(start, end, is_blockwise)
     let start = a:is_blockwise ? nextnonblank(a:start) : a:start
     let end = a:is_blockwise ? prevnonblank(a:end) : a:end
 
+    let outermost_indent = min([indent(start), indent(end)])
+
     if &expandtab
-        let outermost_first_char_column = a:outermost_indent + 1
+        let outermost_first_char_column = outermost_indent + 1
     else
-        let outermost_first_char_column = (a:outermost_indent / &tabstop) + 1
+        let outermost_first_char_column = (outermost_indent / &tabstop) + 1
     endif
 
     call cursor(a:end, outermost_first_char_column)
@@ -265,7 +267,7 @@ function! s:set_visual_selection(start, end, is_blockwise, outermost_indent)
     if a:is_blockwise
         exe "normal! \<C-v>"
         call cursor(start, outermost_first_char_column)
-        exe "normal! _O$"
+        exe "normal! $"
     else
         exe "normal! V"
         call cursor(start, outermost_first_char_column)

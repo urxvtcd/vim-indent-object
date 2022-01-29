@@ -1,4 +1,6 @@
 Before:
+  set expandtab
+
   omap ii <Plug>(indent-object_linewise-none)
   xmap ii <Plug>(indent-object_linewise-none)
   omap ai <Plug>(indent-object_linewise-start)

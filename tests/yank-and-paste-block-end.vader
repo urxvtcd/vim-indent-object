@@ -1,0 +1,21 @@
+Include: before.vader
+
+Given (a three-level buffer):
+  first line
+      second line
+      third line
+          fourth line
+          fifth line
+      sixth line
+  seventh line
+
+Do (yank the innermost indent with closing delimiter, remove everything, paste yanked):
+  /fourth\<CR>
+  yibI
+  ggdG
+  "0p
+
+Expect (innermost indent with closing delimiter without common indent):
+      fourth line
+      fifth line
+  sixth line

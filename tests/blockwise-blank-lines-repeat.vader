@@ -1,4 +1,3 @@
-
 Include: before.vader
 
 Given (a two-level buffer with the inner level surrounded by blank lines):

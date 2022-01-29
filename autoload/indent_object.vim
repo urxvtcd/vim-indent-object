@@ -89,7 +89,7 @@ function! s:expand_range(initial_range, count)
     " or greater indent level as the outermost indent found in the selection,
     " we need to differentiate whether the selection was created manually by
     " user, or by our previous invocation. In the first case, we should leave
-    " the selection untouched. Rationale: mapping to delete and indent level
+    " the selection untouched. Rationale: mapping to delete an indent level
     " consisting of a single line should only delete that line, and not spill
     " outwards. In the second case, we need to expand outwards, or else
     " growing the selection iteratively in visual mode would not work.

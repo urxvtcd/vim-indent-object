@@ -34,7 +34,9 @@ let s:last_range = {
     \ 'end': -1,
     \ }
 
-function! indent_object#handle_operator_mapping(include_start, include_end, is_blockwise, keep)
+function! indent_object#handle_operator_mapping(
+    \ include_start, include_end, is_blockwise, keep,
+    \ )
     call s:expand_range(
         \ {
             \ 'include_start': a:include_start,
@@ -48,7 +50,9 @@ function! indent_object#handle_operator_mapping(include_start, include_end, is_b
             \ )
 endfunction
 
-function! indent_object#handle_visual_mapping(include_start, include_end, is_blockwise, keep)
+function! indent_object#handle_visual_mapping(
+    \ include_start, include_end, is_blockwise, keep,
+    \ )
     call s:expand_range(
         \ {
             \ 'include_start': a:include_start,
@@ -155,7 +159,9 @@ function! s:expand_range(initial_range, count)
     while counts_to_go > 0
         let old_range = copy(range)
 
-        let range.start = s:expand_in_direction(range.start, indent, -1, range.include_start)
+        let range.start = s:expand_in_direction(
+            \ range.start, indent, -1, range.include_start,
+            \ )
         let range.end = s:expand_in_direction(range.end, indent, 1, range.include_end)
 
         call s:fix_delimiters(range)
@@ -174,7 +180,9 @@ function! s:expand_range(initial_range, count)
 
             " Set indent to the innermost adjacent one, so next iteration
             " makes progress.
-            let indent = s:find_innermost_indent_adjacent_to_range(range.start, range.end)
+            let indent = s:find_innermost_indent_adjacent_to_range(
+                \ range.start, range.end,
+                \ )
         else
             let counts_to_go -= 1
             let should_expand_outward = 1
@@ -182,9 +190,13 @@ function! s:expand_range(initial_range, count)
     endwhile
 
     if range.keep == "start"
-        call s:set_visual_selection(a:initial_range.start, range.end, range.is_blockwise)
+        call s:set_visual_selection(
+            \ a:initial_range.start, range.end, range.is_blockwise,
+            \ )
     elseif range.keep == "end"
-        call s:set_visual_selection(range.start, a:initial_range.end, range.is_blockwise)
+        call s:set_visual_selection(
+            \ range.start, a:initial_range.end, range.is_blockwise,
+            \ )
     else
         call s:set_visual_selection(range.start, range.end, range.is_blockwise)
     endif
@@ -234,7 +246,12 @@ function! s:fix_delimiters(range)
     " not include the line. In other words: include flag for a line only
     " applies when that line actually delimits this indent block.
     if a:range.include_start
-        let closing_line = a:range.include_end ? a:range.end : nextnonblank(a:range.end + 1)
+        if a:range.include_end
+            let closing_line = a:range.end
+        else
+            let closing_line = nextnonblank(a:range.end + 1)
+        endif
+
         let closing_indent = indent(closing_line)
         if indent(a:range.start) < closing_indent
             let a:range.start += 1
@@ -242,7 +259,12 @@ function! s:fix_delimiters(range)
     endif
 
     if a:range.include_end
-        let opening_line = a:range.include_start ? a:range.start : prevnonblank(a:range.start - 1)
+        if a:range.include_start
+            let opening_line = a:range.start
+        else
+            let opening_line = prevnonblank(a:range.start - 1)
+        endif
+
         let opening_indent = indent(opening_line)
         if indent(a:range.end) < opening_indent
             let a:range.end -= 1

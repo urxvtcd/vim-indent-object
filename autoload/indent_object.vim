@@ -26,40 +26,40 @@
 "--------------------------------------------------------------------------------
 
 let s:last_range = {
-            \ 'include_start': 0,
-            \ 'include_end': 0,
-            \ 'is_blockwise': 0,
-            \ 'keep': '',
-            \ 'start': -1,
-            \ 'end': -1,
-            \ }
+    \ 'include_start': 0,
+    \ 'include_end': 0,
+    \ 'is_blockwise': 0,
+    \ 'keep': '',
+    \ 'start': -1,
+    \ 'end': -1,
+    \ }
 
 function! indent_object#handle_operator_mapping(include_start, include_end, is_blockwise, keep)
     call s:expand_range(
-                \ {
-                    \ 'include_start': a:include_start,
-                    \ 'include_end': a:include_end,
-                    \ 'is_blockwise': a:is_blockwise,
-                    \ 'keep': a:keep,
-                    \ 'start': line("."),
-                    \ 'end': line("."),
-                    \ },
-                    \ v:count1,
-                    \ )
+        \ {
+            \ 'include_start': a:include_start,
+            \ 'include_end': a:include_end,
+            \ 'is_blockwise': a:is_blockwise,
+            \ 'keep': a:keep,
+            \ 'start': line("."),
+            \ 'end': line("."),
+            \ },
+            \ v:count1,
+            \ )
 endfunction
 
 function! indent_object#handle_visual_mapping(include_start, include_end, is_blockwise, keep)
     call s:expand_range(
-                \ {
-                    \ 'include_start': a:include_start,
-                    \ 'include_end': a:include_end,
-                    \ 'is_blockwise': a:is_blockwise,
-                    \ 'keep': a:keep,
-                    \ 'start': line("'<"),
-                    \ 'end': line("'>"),
-                    \ },
-                    \ v:count1,
-                    \ )
+        \ {
+            \ 'include_start': a:include_start,
+            \ 'include_end': a:include_end,
+            \ 'is_blockwise': a:is_blockwise,
+            \ 'keep': a:keep,
+            \ 'start': line("'<"),
+            \ 'end': line("'>"),
+            \ },
+            \ v:count1,
+            \ )
 endfunction
 
 function! indent_object#repeat_visual_mapping()

@@ -262,7 +262,7 @@ function! s:set_visual_selection(start, end, is_blockwise)
         let outermost_first_char_column = (outermost_indent / &tabstop) + 1
     endif
 
-    call cursor(a:end, outermost_first_char_column)
+    call cursor(end, outermost_first_char_column)
 
     if a:is_blockwise
         exe "normal! \<C-v>"

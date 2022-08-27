@@ -23,9 +23,9 @@ and rewritten to
   - add mapping repeating last visual selection,
   - allow the closing delimiter to be selected independently,
   - handle mismatched delimiters better,
-  - move from hardcoded mappings to `<Plug>` ones,
-  - use on-demand loading via vim's autoload feature,
-  - move from vmap and vnoremap to xmap and xnoremap,
+  - move from hard-coded mappings to <Plug> ones,
+  - use on-demand loading via vim's |autoload| feature,
+  - move from |:vmap| and |:vnoremap| to |:xmap| and |:xnoremap|,
   - and back all of this up with tests using Vader framework.
 
 ==============================================================================
@@ -34,7 +34,7 @@ and rewritten to
 USAGE
 
 The plugin defines no default concrete mappings, only abstract <Plug> ones.
-You'll find them described below. Unless notet otherwise, mappings can be
+You'll find them described below. Unless noted otherwise, mappings can be
 invoked from either of visual or operator-pending mode.
 
 Visual mode allows for iteration and interaction, as the mappings can be called
@@ -42,10 +42,10 @@ multiple times to iteratively increase the selected range. The initial indent
 level is the indent level of the outermost line in the selected range.
 
 Operator-pending mode allows for the text objects to be targets of verbs like
-`d`, `c`, and so on. The initial indent level is the indent level of the
+|d|, |c|, and so on. The initial indent level is the indent level of the
 current line.
 
-All of the mappings accept counts.
+All of the mappings accept a |count|.
 
 The plugin seems to be working fine in scenarios with tabs mixed with spaces,
 however this is not actively tested for. Feel free to report weird behaviors.
@@ -88,10 +88,10 @@ Example:
                                          *<Plug>(indent-object_blockwise-end)*
                                         *<Plug>(indent-object_blockwise-both)*
 
-The delimiter mappins are mappings that beside the usual selection also include
+The delimiter mappings are mappings that beside the usual selection also include
 delimiters for given indent. The starting and ending delimiters for a selection
 with given indent level are defined as one line above and below having indent
-level smaller than the selection. You can targer either one, or both of them.
+level smaller than the selection. You can target either one, or both of them.
 
 If the delimiters have different indent, only the one with smaller indent is
 taken into account, and the other one is assumed missing.
@@ -131,7 +131,7 @@ mappings: two basic ones, and two delimiter ones:
   - keep start the same, and go down
   - keep start the same, and go down, including an ending delimiter
   - keep end the same, and go up
-  - keep end the same, and go up, inluding a starting delimiter
+  - keep end the same, and go up, including a starting delimiter
 
 Example of basic mappings:
 >
@@ -207,3 +207,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

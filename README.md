@@ -29,7 +29,9 @@ You know how to do it.
 
 ## Usage
 
-Because of DRY, see [vim help documentation file](doc/indent-object.txt).
+This plugin defines no mappings by default. You need to define them yourself.
+For this, and for other info, see [the vim help documentation
+file](doc/indent-object.txt).
 
 ## Tests
 

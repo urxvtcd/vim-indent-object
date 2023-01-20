@@ -19,33 +19,42 @@ is useful for languages with block end statements. It's a fork of
 http://github.com/michaeljsmith/vim-indent-object. The original was forked
 and rewritten to
   - hopefully make the code clearer,
-  - add the blockwise objects that strip common indent from selection,
+  - add the blockwise objects that select text without indent that is common to
+    all the selected lines,
   - add mapping repeating last visual selection,
-  - allow the closing delimiter to be selected independently,
+  - add mappings selecting a range and its ending delimiter line (a line
+    following the selection that has smaller indent than the selection),
   - handle mismatched delimiters better,
   - move from hard-coded mappings to <Plug> ones,
   - use on-demand loading via vim's |autoload| feature,
   - move from |:vmap| and |:vnoremap| to |:xmap| and |:xnoremap|,
   - and back all of this up with tests using Vader framework.
 
+In this document the phrases "greater indent level", or "smaller indent level"
+are used. For the sake of clarity: the less the whitespace preceding given
+line, the smaller the indent level.
+
 ==============================================================================
                                                          *indent-object-usage*
                                                       *indent-object-mappings*
 USAGE
 
-The plugin defines no default concrete mappings, only abstract <Plug> ones.
-You'll find them described below. Unless noted otherwise, mappings can be
-invoked from either of visual or operator-pending mode.
-
-Visual mode allows for iteration and interaction, as the mappings can be called
-multiple times to iteratively increase the selected range. The initial indent
-level is the indent level of the outermost line in the selected range.
-
-Operator-pending mode allows for the text objects to be targets of verbs like
-|d|, |c|, and so on. The initial indent level is the indent level of the
-current line.
+The plugin defines no default mappings, only abstract <Plug> ones. You'll find
+them described below. Unless noted otherwise, mappings can be invoked from
+either of visual or operator-pending mode.
 
 All of the mappings accept a |count|.
+
+Visual mode allows for iteration and interaction. The visual mappings can be
+called multiple times to iteratively increase the selected range. Once you
+select some range, with this plugin or otherwise, subsequent invocations will
+increase the range of the selection in the following way. The plugin will find
+the line having the smallest indent in the selection, and then select all the
+lines having an indent level one smaller than that.
+
+Operator-pending mode allows for the text objects to be targets of verbs like
+|d|, |c|, and so on. In this mode, the selection is determined by the indent
+level of the current line, and can be increased by a count.
 
 The plugin seems to be working fine in scenarios with tabs mixed with spaces,
 however this is not actively tested for. Feel free to report weird behaviors.
@@ -56,11 +65,12 @@ however this is not actively tested for. Feel free to report weird behaviors.
 
 Mappings come in pairs of linewise and blockwise. The linewise selection just
 selects whole ranges of lines. The blockwise selection on the other hand strips
-the common indent, that is, the amount of indent equal to the indent level of
-the line found to be outermost in the selection. It is useful for yanking code,
-to be run in REPL for example. If you have used one of the mappings to visually
-select some range, you can toggle between linewise and blockwise selection
-types by issuing corresponding mapping of another type.
+the common indent. Stripping the common indent means that the blockwise
+selection will start in the column of the first non-whitespace character of the
+line with the smallest indent level. It is useful for yanking code, to be run
+in REPL for example. If you have used one of the mappings to visually select
+some range, you can toggle between linewise and blockwise selection types by
+issuing corresponding mapping of another type.
 
 In blockwise mode, leading and trailing blank lines are not included in the
 selection, as they make it impossible to strip leading indent.
@@ -97,22 +107,43 @@ If the delimiters have different indent, only the one with smaller indent is
 taken into account, and the other one is assumed missing.
 
 If you used one of the mappings to visually select some range without
-a delimiter, you can include one or both delimiters without expanding outward
-by invoking a mapping flipping the delimiter flags from false to true. If both
-are flipped like this, both range ends will move, if only one of them is
-flipped and the other is kept the same, one end will move. If a delimiter flag
-is flipped from true to false, this is treated as a request to expand the
-selection to another, smaller, indent level.
+a delimiter, you can include one or both delimiters without expanding the
+selection to another, smaller indent level. To do so, invoke a mapping flipping the
+delimiter flags from false to true. If both are flipped like this, both range
+ends will move, if only one of them is flipped and the other is kept the same,
+one end will move. If a delimiter flag is flipped from true to false, this is
+treated as a request to expand the selection to another, smaller, indent
+level.
 
-
-Example:
+Example mappings for the starting delimiter:
 >
     xmap ai <Plug>(indent-object_linewise-start)
     omap ai <Plug>(indent-object_linewise-start)
+<
+Same, but blockwise:
+>
+    xmap abi <Plug>(indent-object_blockwise-start)
+    omap abi <Plug>(indent-object_blockwise-start)
+<
+Example mappings for the ending delimiter:
+>
     xmap iI <Plug>(indent-object_linewise-end)
     omap iI <Plug>(indent-object_linewise-end)
+<
+Same, but blockwise:
+>
+    xmap ibI <Plug>(indent-object_blockwise-end)
+    omap ibI <Plug>(indent-object_blockwise-end)
+<
+Example mappings for both delimiters:
+>
     xmap aI <Plug>(indent-object_linewise-both)
     omap aI <Plug>(indent-object_linewise-both)
+<
+Same, but blockwise:
+>
+    xmap abI <Plug>(indent-object_blockwise-both)
+    omap abI <Plug>(indent-object_blockwise-both)
 <
 ------------------------------------------------------------------------------
                                              *indent-object-keep-end-mappings*
@@ -128,39 +159,49 @@ Example:
 The "keep end" mappings are mappings that expand selection only in one way,
 upward or downward. There are four linewise text objects for "keep end"
 mappings: two basic ones, and two delimiter ones:
-  - keep start the same, and go down
-  - keep start the same, and go down, including an ending delimiter
-  - keep end the same, and go up
-  - keep end the same, and go up, including a starting delimiter
 
-Example of basic mappings:
+  - keep start the same, and go down
 >
     omap ij <Plug>(indent-object_linewise-none-keep-start)
     xmap ij <Plug>(indent-object_linewise-none-keep-start)
+<
+  - keep start the same, and go down, including ending delimiter
+>
+    omap ij <Plug>(indent-object_linewise-none-keep-start)
+    xmap ij <Plug>(indent-object_linewise-none-keep-start)
+<
+  - keep end the same, and go up
+>
     omap ik <Plug>(indent-object_linewise-none-keep-end)
     xmap ik <Plug>(indent-object_linewise-none-keep-end)
 <
-
-Example of delimiter mappings:
+  - keep end the same, and go up, including starting delimiter
 >
-    omap iJ <Plug>(indent-object_linewise-end-keep-start)
-    xmap iJ <Plug>(indent-object_linewise-end-keep-start)
     omap iK <Plug>(indent-object_linewise-start-keep-end)
     xmap iK <Plug>(indent-object_linewise-start-keep-end)
 <
+The linewise mappings have their blockwise companions:
 
-The linewise mappings have their blockwise companions. Example:
+  - keep start the same, and go down
 >
     omap ibj <Plug>(indent-object_blockwise-none-keep-start)
     xmap ibj <Plug>(indent-object_blockwise-none-keep-start)
+<
+  - keep start the same, and go down, including ending delimiter
+>
     omap ibJ <Plug>(indent-object_blockwise-end-keep-start)
     xmap ibJ <Plug>(indent-object_blockwise-end-keep-start)
-
+<
+  - keep end the same, and go up
+>
     omap ibk <Plug>(indent-object_blockwise-none-keep-end)
     xmap ibk <Plug>(indent-object_blockwise-none-keep-end)
+<
+  - keep end the same, and go up, including starting delimiter
+>
     omap ibK <Plug>(indent-object_blockwise-start-keep-end)
     xmap ibK <Plug>(indent-object_blockwise-start-keep-end)
->
+<
 
 ------------------------------------------------------------------------------
                                                 *<Plug>(indent-object_repeat)*

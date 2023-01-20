@@ -8,11 +8,13 @@ is useful for languages with block end statements. It's a fork of
 and rewritten to
 
   - hopefully make the code clearer,
-  - add the blockwise objects that strip common indent from selection,
+  - add the blockwise objects that select text without indent that is common to
+    all the selected lines,
   - add mapping repeating last visual selection,
   - add mappings expanding one end of selection and keeping the other the same,
-  - allow the closing delimiter to be selected independently,
-  - handle mismatched delimiters better,
+  - add mappings selecting a range and its closing delimiter line (a line
+    following the selection that has smaller indent than the selection),
+  - handle mismatched opening and closing delimiters better,
   - move from hard-coded mappings to `<Plug>` ones,
   - use on-demand loading via vim's autoload feature,
   - move from `vmap` and `vnoremap` to `xmap` and `xnoremap`,

@@ -40,8 +40,9 @@ omap ii <Plug>(indent-object_blockwise-none)
 ```
 
 It selects all lines with the same or greater indent level. It works in both
-visual and operator-pending mode. It accepts counts, and in visual mode it can
-be repeated to expand the selection.
+visual mode (try typing `vii` in normal mode) and operator-pending mode (try
+typing `dii` in normal mode). It accepts counts, and in visual mode it can be
+repeated to expand the selection.
 
 See [the vim help documentation file](doc/indent-object.txt) for many more
 mappings.

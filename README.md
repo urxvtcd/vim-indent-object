@@ -31,18 +31,25 @@ You know how to do it.
 
 ## Usage
 
-This plugin defines no mappings by default. You need to define them yourself.
-Though most people will probably be happy with just the most basic one:
+**This plugin defines no mappings by default.** You need to define them
+yourself. Though most people will probably be happy with just the most basic
+ones:
 
 ```vim
 xmap ii <Plug>(indent-object_linewise-none)
 omap ii <Plug>(indent-object_blockwise-none)
 ```
 
-It selects all lines with the same or greater indent level. It works in both
-visual mode (try typing `vii` in normal mode) and operator-pending mode (try
-typing `dii` in normal mode). It accepts counts, and in visual mode it can be
-repeated to expand the selection.
+The mapping above selects all lines with the same or greater indent level. It
+works in both visual mode (try typing `vii` in normal mode) and
+operator-pending mode (try typing `dii` in normal mode).
+
+To make it possible to expand the selection outward, you need to add the
+following mapping as well:
+
+```vim
+xmap <C-o> <Plug>(indent-object_repeat)
+```
 
 See [the vim help documentation file](doc/indent-object.txt) for many more
 mappings.

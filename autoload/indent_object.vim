@@ -25,6 +25,9 @@
 "
 "--------------------------------------------------------------------------------
 
+" Fix for older versions of vim, where the variable is not defined.
+let s:numbermax = exists("v:numbermax") ? v:numbermax : 1000000000000
+
 let s:last_range = {
     \ 'include_start': 0,
     \ 'include_end': 0,
@@ -333,7 +336,7 @@ function! s:find_innermost_indent_adjacent_to_range(start, end)
 endfunction
 
 function! s:find_outermost_indent_in_range(start, end)
-    let indent = v:numbermax
+    let indent = s:numbermax
     let found = 0
 
     for line in range(a:start, a:end)
